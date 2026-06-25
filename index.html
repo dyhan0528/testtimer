@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>타임어택 타이머</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#0E5C3F;
+    --green-deep:#0A4530;
+    --paper:#F5F1E8;
+    --paper-2:#EDE7D9;
+    --ink:#1E2420;
+    --muted:#6B7269;
+    --warn:#C8631F;
+    --danger:#B23A2E;
+    --line:rgba(14,92,63,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"IBM Plex Sans KR",sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{width:100%;max-width:520px}
+  header{text-align:center;margin-bottom:22px}
+  header h1{
+    font-family:"Fraunces",serif;
+    font-weight:600;
+    font-size:1.75rem;
+    color:var(--green);
+    letter-spacing:-.01em;
+  }
+  header p{color:var(--muted);font-size:.85rem;margin-top:4px}
+
+  /* ---- cover / hero ---- */
+  .cover{
+    background:var(--green);
+    background:linear-gradient(150deg,var(--green) 0%,var(--green-deep) 100%);
+    border-radius:18px;
+    padding:30px 26px 28px;
+    margin-bottom:18px;
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 8px 24px rgba(10,69,48,.25);
+  }
+  .cover::after{
+    content:"";position:absolute;right:-50px;top:-50px;
+    width:180px;height:180px;border-radius:50%;
+    background:rgba(245,241,232,.06);
+  }
+  .cover .badge{
+    display:inline-block;
+    font-family:"IBM Plex Sans KR",sans-serif;
+    font-size:.7rem;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;
+    background:var(--warn);color:#fff;
+    padding:5px 11px;border-radius:6px;margin-bottom:16px;
+    position:relative;z-index:1;
+  }
+  .cover h1{
+    font-family:"Fraunces",serif;font-weight:700;
+    font-size:2.15rem;line-height:1.12;letter-spacing:-.02em;
+    margin-bottom:18px;position:relative;z-index:1;
+  }
+  .cover h1 .hl{color:#FFD27A}
+  .cover ul{list-style:none;position:relative;z-index:1}
+  .cover li{
+    font-size:.92rem;font-weight:500;line-height:1.5;
+    padding-left:20px;position:relative;
+    color:rgba(245,241,232,.92);
+    margin-bottom:8px;
+  }
+  .cover li:last-child{margin-bottom:0}
+  .cover li::before{
+    content:"›";position:absolute;left:2px;top:-1px;
+    color:#FFD27A;font-weight:700;font-size:1.05rem;
+  }
+  .cover li b{color:#fff;font-weight:700}
+  .cover .by{
+    position:absolute;right:22px;bottom:18px;z-index:1;
+    font-size:.66rem;font-weight:700;letter-spacing:.16em;
+    color:rgba(245,241,232,.55);
+  }
+
+  .credit{
+    text-align:center;margin-top:22px;
+    font-size:.72rem;letter-spacing:.08em;color:var(--muted);
+  }
+  .credit b{color:var(--green);font-weight:700}
+
+  /* ---- setup panel ---- */
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    box-shadow:0 1px 0 rgba(14,92,63,.05);
+  }
+  .field{margin-bottom:20px}
+  .field:last-child{margin-bottom:0}
+  .label{
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .seg button{
+    font-family:inherit;
+    font-size:.95rem;
+    font-weight:600;
+    padding:12px 0;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-2);
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .seg button:hover{border-color:var(--green)}
+  .seg button.active{background:var(--green);color:#fff;border-color:var(--green)}
+  .seg button small{display:block;font-weight:400;font-size:.62rem;opacity:.7;margin-top:2px}
+
+  .count-row{display:flex;align-items:center;gap:12px}
+  .count-row input{
+    flex:1;
+    font-family:inherit;
+    font-size:1.1rem;
+    font-weight:600;
+    text-align:center;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-2);
+    color:var(--ink);
+  }
+  .step{
+    width:48px;height:48px;flex:0 0 auto;
+    border:1px solid var(--line);border-radius:10px;
+    background:var(--paper-2);font-size:1.4rem;font-weight:600;
+    color:var(--green);cursor:pointer;
+  }
+  .step:hover{border-color:var(--green)}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between}
+  .toggle-row span{font-size:.9rem;font-weight:500}
+  .switch{position:relative;width:46px;height:26px;flex:0 0 auto}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:var(--paper-2);border:1px solid var(--line);border-radius:26px;cursor:pointer;transition:.2s}
+  .slider::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch input:checked + .slider{background:var(--green);border-color:var(--green)}
+  .switch input:checked + .slider::before{transform:translateX(20px)}
+
+  .start{
+    width:100%;margin-top:24px;
+    font-family:inherit;font-size:1.05rem;font-weight:700;
+    padding:16px;border:none;border-radius:12px;
+    background:var(--green);color:#fff;cursor:pointer;transition:background .15s;
+  }
+  .start:hover{background:var(--green-deep)}
+
+  /* ---- run screen ---- */
+  .run{display:none;text-align:center}
+  .run.show{display:block}
+  .qmeta{
+    font-size:.8rem;font-weight:600;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;
+  }
+  .qnum{font-family:"Fraunces",serif;font-weight:600;font-size:1.4rem;color:var(--green);margin-bottom:18px}
+
+  .ring{position:relative;width:260px;height:260px;margin:0 auto 8px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .track{stroke:var(--paper-2)}
+  .ring .prog{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset .25s linear,stroke .3s}
+  .ring .time{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .ring .time b{
+    font-family:"Fraunces",serif;font-weight:600;
+    font-size:3.4rem;line-height:1;color:var(--ink);
+    font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  }
+  .ring .time em{font-style:normal;font-size:.8rem;color:var(--muted);margin-top:8px;font-weight:500}
+
+  .run.warn .prog{stroke:var(--warn)}
+  .run.danger .prog{stroke:var(--danger)}
+  .run.danger .ring .time b{color:var(--danger)}
+
+  .ctrls{display:flex;gap:10px;margin-top:24px}
+  .ctrls button{
+    flex:1;font-family:inherit;font-size:.95rem;font-weight:600;
+    padding:14px 0;border-radius:11px;cursor:pointer;transition:all .15s;border:1px solid var(--line);
+  }
+  .btn-main{background:var(--green);color:#fff;border-color:var(--green)}
+  .btn-main:hover{background:var(--green-deep)}
+  .btn-sub{background:#fff;color:var(--ink)}
+  .btn-sub:hover{border-color:var(--green)}
+  .btn-quit{background:#fff;color:var(--danger);border-color:rgba(178,58,46,.3)}
+  .btn-quit:hover{background:rgba(178,58,46,.06)}
+
+  .dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:22px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line)}
+  .dot.done{background:var(--green);border-color:var(--green)}
+  .dot.cur{background:var(--warn);border-color:var(--warn);transform:scale(1.3)}
+
+  /* ---- done screen ---- */
+  .done{display:none;text-align:center;padding:30px 0}
+  .done.show{display:block}
+  .done h2{font-family:"Fraunces",serif;font-weight:600;font-size:2rem;color:var(--green);margin-bottom:8px}
+  .done p{color:var(--muted);margin-bottom:26px}
+  .done .stat{font-family:"Fraunces",serif;font-size:1.1rem;color:var(--ink);margin-bottom:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:none"></header>
+
+  <div class="cover">
+    <span class="badge">TIME ATTACK · 필수</span>
+    <h1>느리면,<br><span class="hl">틀린 거다.</span></h1>
+    <ul>
+      <li>시험은 아는 게 아니라 <b>시간 안에 푸는 것</b>이다</li>
+      <li>고민하는 순간, 시간은 너를 <b>버린다</b></li>
+      <li>보자마자 답을 체크하는 <b>손</b>을 만들어라</li>
+    </ul>
+    <span class="by">BY DYHAN</span>
+  </div>
+
+  <!-- SETUP -->
+  <div class="panel" id="setup">
+    <div class="field">
+      <div class="label">문제당 시간</div>
+      <div class="seg" id="segTime">
+        <button data-min="1" class="active">1분<small>60초</small></button>
+        <button data-min="2">2분<small>120초</small></button>
+        <button data-min="3">3분<small>180초</small></button>
+        <button data-min="5">5분<small>300초</small></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="label">문제 수</div>
+      <div class="count-row">
+        <button class="step" id="cMinus">−</button>
+        <input type="number" id="qCount" value="10" min="1" max="200">
+        <button class="step" id="cPlus">+</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="toggle-row">
+        <span>시간 종료 알림음</span>
+        <label class="switch">
+          <input type="checkbox" id="sound" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="toggle-row">
+        <span>음성 안내</span>
+        <label class="switch">
+          <input type="checkbox" id="voice" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <button class="start" id="startBtn">시작</button>
+  </div>
+
+  <!-- RUN -->
+  <div class="run" id="run">
+    <div class="qmeta" id="qmeta">QUESTION</div>
+    <div class="qnum" id="qnum">1 / 10</div>
+    <div class="ring">
+      <svg width="260" height="260" viewBox="0 0 260 260">
+        <circle class="track" cx="130" cy="130" r="118" fill="none" stroke-width="14"/>
+        <circle class="prog" id="prog" cx="130" cy="130" r="118" fill="none" stroke-width="14"/>
+      </svg>
+      <div class="time">
+        <b id="timeText">1:00</b>
+        <em id="phase">남은 시간</em>
+      </div>
+    </div>
+    <div class="ctrls">
+      <button class="btn-sub" id="pauseBtn">일시정지</button>
+      <button class="btn-main" id="nextBtn">다음 문제</button>
+    </div>
+    <div class="ctrls" style="margin-top:10px">
+      <button class="btn-quit" id="quitBtn">종료</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <!-- DONE -->
+  <div class="done" id="done">
+    <h2>완료</h2>
+    <p>모든 문제가 끝났습니다</p>
+    <div class="stat" id="doneStat"></div>
+    <button class="start" id="againBtn" style="margin-top:0">다시 시작</button>
+  </div>
+
+  <div class="credit">made by <b>DYHAN</b></div>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const setup=$("setup"), run=$("run"), done=$("done");
+
+  // ---- setup state ----
+  let perSec = 60;
+  let total = 10;
+
+  // time segment
+  $("segTime").querySelectorAll("button").forEach(b=>{
+    b.onclick=()=>{
+      $("segTime").querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      perSec = parseInt(b.dataset.min,10)*60;
+    };
+  });
+
+  // count
+  const clampCount=v=>Math.max(1,Math.min(200,v||1));
+  function syncCount(){ $("qCount").value=total; }
+  $("cMinus").onclick=()=>{ total=clampCount(total-1); syncCount(); };
+  $("cPlus").onclick =()=>{ total=clampCount(total+1); syncCount(); };
+  $("qCount").oninput=()=>{ total=clampCount(parseInt($("qCount").value,10)); };
+  $("qCount").onblur =()=>{ syncCount(); };
+
+  // ---- run state ----
+  const R=118, C=2*Math.PI*R;
+  $("prog").style.strokeDasharray=C;
+  let cur=0, remain=0, timer=null, paused=false, soundOn=true, voiceOn=true;
+
+  function fmt(s){
+    const m=Math.floor(s/60), ss=s%60;
+    return m+":"+String(ss).padStart(2,"0");
+  }
+
+  // beep via WebAudio (no external file)
+  let actx=null;
+  function beep(){
+    if(!soundOn) return;
+    try{
+      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+      const seq=[880,660,880];
+      seq.forEach((f,i)=>{
+        const o=actx.createOscillator(), g=actx.createGain();
+        o.type="sine"; o.frequency.value=f;
+        const t=actx.currentTime+i*0.18;
+        o.connect(g); g.connect(actx.destination);
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.exponentialRampToValueAtTime(0.3,t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+        o.start(t); o.stop(t+0.17);
+      });
+    }catch(e){}
+  }
+
+  // ---- 음성 안내 (Web Speech API) ----
+  const LINES = {
+    start: ["시작하세요"],
+    next:  ["넘어가세요"],
+    end:   ["끝"]
+  };
+  let krVoice=null;
+  function pickVoice(){
+    const vs=window.speechSynthesis?window.speechSynthesis.getVoices():[];
+    krVoice = vs.find(v=>v.lang==="ko-KR"||v.lang==="ko_KR") || vs.find(v=>/^ko/.test(v.lang)) || null;
+  }
+  if(window.speechSynthesis){
+    pickVoice();
+    window.speechSynthesis.onvoiceschanged=pickVoice;
+  }
+  function say(kind){
+    if(!voiceOn || !window.speechSynthesis) return;
+    const pool=LINES[kind]; if(!pool) return;
+    const text=pool[Math.floor(Math.random()*pool.length)];
+    try{
+      const u=new SpeechSynthesisUtterance(text);
+      u.lang="ko-KR";
+      if(krVoice) u.voice=krVoice;
+      u.rate=1; u.pitch=1; u.volume=1;
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function stopSpeech(){ try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){} }
+
+  function buildDots(){
+    const d=$("dots"); d.innerHTML="";
+    for(let i=0;i<total;i++){
+      const s=document.createElement("div");
+      s.className="dot"; s.id="dot"+i;
+      d.appendChild(s);
+    }
+  }
+  function paintDots(){
+    for(let i=0;i<total;i++){
+      const el=$("dot"+i); if(!el) continue;
+      el.className="dot"+(i<cur?" done":(i===cur?" cur":""));
+    }
+  }
+
+  function render(){
+    $("timeText").textContent=fmt(remain);
+    $("qnum").textContent=(cur+1)+" / "+total;
+    const off=C*(1-remain/perSec);
+    $("prog").style.strokeDashoffset=off;
+    run.classList.remove("warn","danger");
+    if(remain<=5) run.classList.add("danger");
+    else if(remain<=Math.max(10,perSec*0.25)) run.classList.add("warn");
+  }
+
+  function tick(){
+    if(paused) return;
+    remain--;
+    if(remain<0){
+      beep();
+      advance(true);
+      return;
+    }
+    render();
+  }
+
+  function startQuestion(){
+    remain=perSec;
+    paused=false;
+    $("pauseBtn").textContent="일시정지";
+    paintDots();
+    render();
+    say("start");
+    clearInterval(timer);
+    timer=setInterval(tick,1000);
+  }
+
+  function advance(auto){
+    cur++;
+    if(cur>=total){ finish(); return; }
+    say("next");
+    startQuestion();
+  }
+
+  function finish(){
+    clearInterval(timer);
+    say("end");
+    run.classList.remove("show");
+    done.classList.add("show");
+    const mins=Math.round(total*perSec/60);
+    $("doneStat").textContent="총 "+total+"문제 · 문제당 "+(perSec/60)+"분 · 설정 시간 "+mins+"분";
+  }
+
+  function startSession(){
+    soundOn=$("sound").checked;
+    voiceOn=$("voice").checked;
+    stopSpeech();
+    total=clampCount(parseInt($("qCount").value,10));
+    cur=0;
+    setup.style.display="none";
+    done.classList.remove("show");
+    run.classList.add("show");
+    $("qmeta").textContent="QUESTION";
+    buildDots();
+    startQuestion();
+  }
+
+  function reset(){
+    clearInterval(timer);
+    stopSpeech();
+    run.classList.remove("show","warn","danger");
+    done.classList.remove("show");
+    setup.style.display="block";
+  }
+
+  // controls
+  $("startBtn").onclick=startSession;
+  $("againBtn").onclick=reset;
+  $("nextBtn").onclick=()=>advance(false);
+  $("quitBtn").onclick=reset;
+  $("pauseBtn").onclick=()=>{
+    paused=!paused;
+    $("pauseBtn").textContent=paused?"계속":"일시정지";
+    $("phase").textContent=paused?"일시정지":"남은 시간";
+  };
+
+  // keyboard: space=pause, n/→=next, esc=quit
+  document.addEventListener("keydown",e=>{
+    if(!run.classList.contains("show")) return;
+    if(e.code==="Space"){ e.preventDefault(); $("pauseBtn").click(); }
+    else if(e.key==="n"||e.key==="ArrowRight"){ advance(false); }
+    else if(e.key==="Escape"){ reset(); }
+  });
+
+  syncCount();
+})();
+</script>
+</body>
+</html>
