@@ -2,8 +2,17 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>타임어택 타이머</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>박지환 전용 공부 타이머</title>
+<meta name="description" content="박지환 전용 타임어택 공부 타이머. 딴생각 금지.">
+<meta name="theme-color" content="#0E5C3F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="지환 타이머">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -31,17 +40,30 @@
     align-items:center;
     padding:24px 16px 40px;
     -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
   }
+  body.focus{padding-top:14px}
   .wrap{width:100%;max-width:520px}
-  header{text-align:center;margin-bottom:22px}
-  header h1{
-    font-family:"Fraunces",serif;
-    font-weight:600;
-    font-size:1.75rem;
-    color:var(--green);
-    letter-spacing:-.01em;
+
+  /* ---- owner tag ---- */
+  .owner{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:12px;
   }
-  header p{color:var(--muted);font-size:.85rem;margin-top:4px}
+  .owner .name{
+    font-family:"Fraunces",serif;font-weight:700;
+    font-size:1.35rem;color:var(--green);letter-spacing:-.01em;
+  }
+  .owner .name small{
+    display:block;font-family:"IBM Plex Sans KR",sans-serif;
+    font-size:.68rem;font-weight:600;letter-spacing:.14em;
+    color:var(--muted);text-transform:uppercase;margin-bottom:2px;
+  }
+  .owner .today{
+    text-align:right;font-size:.72rem;color:var(--muted);line-height:1.45;
+  }
+  .owner .today b{color:var(--green);font-weight:700;font-size:.95rem}
+  body.focus .owner{display:none}
 
   /* ---- cover / hero ---- */
   .cover{
@@ -62,7 +84,6 @@
   }
   .cover .badge{
     display:inline-block;
-    font-family:"IBM Plex Sans KR",sans-serif;
     font-size:.7rem;font-weight:700;letter-spacing:.14em;
     text-transform:uppercase;
     background:var(--warn);color:#fff;
@@ -75,7 +96,7 @@
     margin-bottom:18px;position:relative;z-index:1;
   }
   .cover h1 .hl{color:#FFD27A}
-  .cover ul{list-style:none;position:relative;z-index:1}
+  .cover ul{list-style:none;position:relative;z-index:1;padding-bottom:16px}
   .cover li{
     font-size:.92rem;font-weight:500;line-height:1.5;
     padding-left:20px;position:relative;
@@ -93,12 +114,14 @@
     font-size:.66rem;font-weight:700;letter-spacing:.16em;
     color:rgba(245,241,232,.55);
   }
+  body.focus .cover{display:none}
 
   .credit{
     text-align:center;margin-top:22px;
     font-size:.72rem;letter-spacing:.08em;color:var(--muted);
   }
   .credit b{color:var(--green);font-weight:700}
+  .credit span{opacity:.7}
 
   /* ---- setup panel ---- */
   .panel{
@@ -118,7 +141,7 @@
     letter-spacing:.06em;
     margin-bottom:10px;
   }
-  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
   .seg button{
     font-family:inherit;
     font-size:.95rem;
@@ -158,6 +181,7 @@
 
   .toggle-row{display:flex;align-items:center;justify-content:space-between}
   .toggle-row span{font-size:.9rem;font-weight:500}
+  .toggle-row span small{display:block;font-size:.72rem;color:var(--muted);font-weight:400;margin-top:2px}
   .switch{position:relative;width:46px;height:26px;flex:0 0 auto}
   .switch input{opacity:0;width:0;height:0}
   .slider{position:absolute;inset:0;background:var(--paper-2);border:1px solid var(--line);border-radius:26px;cursor:pointer;transition:.2s}
@@ -173,9 +197,28 @@
   }
   .start:hover{background:var(--green-deep)}
 
+  .hist{
+    margin-top:14px;padding:12px 14px;
+    background:var(--paper-2);border-radius:10px;
+    font-size:.78rem;color:var(--muted);line-height:1.6;
+  }
+  .hist b{color:var(--ink);font-weight:600}
+  .hist .clear{
+    float:right;font-family:inherit;font-size:.7rem;color:var(--muted);
+    background:none;border:none;cursor:pointer;text-decoration:underline;
+  }
+
   /* ---- run screen ---- */
-  .run{display:none;text-align:center}
+  .run{display:none;text-align:center;position:relative}
   .run.show{display:block}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .topbar .mini{font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.06em}
+  .topbar .mini b{color:var(--green)}
+  .icon-btn{
+    font-family:inherit;font-size:.72rem;font-weight:600;
+    padding:7px 11px;border-radius:8px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);cursor:pointer;
+  }
   .qmeta{
     font-size:.8rem;font-weight:600;color:var(--muted);
     text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;
@@ -199,7 +242,16 @@
 
   .run.warn .prog{stroke:var(--warn)}
   .run.danger .prog{stroke:var(--danger)}
-  .run.danger .ring .time b{color:var(--danger)}
+  .run.danger .ring .time b{color:var(--danger);animation:blink .5s steps(2,start) infinite}
+  @keyframes blink{to{visibility:hidden}}
+
+  .alert{
+    display:none;margin:10px auto 0;max-width:360px;
+    padding:10px 14px;border-radius:10px;
+    background:rgba(178,58,46,.1);color:var(--danger);
+    font-size:.85rem;font-weight:600;
+  }
+  .alert.show{display:block}
 
   .ctrls{display:flex;gap:10px;margin-top:24px}
   .ctrls button{
@@ -216,19 +268,49 @@
   .dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:22px}
   .dot{width:9px;height:9px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line)}
   .dot.done{background:var(--green);border-color:var(--green)}
+  .dot.over{background:var(--danger);border-color:var(--danger)}
   .dot.cur{background:var(--warn);border-color:var(--warn);transform:scale(1.3)}
 
   /* ---- done screen ---- */
-  .done{display:none;text-align:center;padding:30px 0}
+  .done{display:none;text-align:center;padding:10px 0 20px}
   .done.show{display:block}
-  .done h2{font-family:"Fraunces",serif;font-weight:600;font-size:2rem;color:var(--green);margin-bottom:8px}
-  .done p{color:var(--muted);margin-bottom:26px}
-  .done .stat{font-family:"Fraunces",serif;font-size:1.1rem;color:var(--ink);margin-bottom:26px}
+  .done h2{font-family:"Fraunces",serif;font-weight:600;font-size:2rem;color:var(--green);margin-bottom:6px}
+  .done .verdict{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:20px}
+  .done .verdict.bad{color:var(--danger)}
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;
+  }
+  .stat{
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 6px;
+  }
+  .stat b{
+    display:block;font-family:"Fraunces",serif;font-weight:600;font-size:1.5rem;color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .stat b.bad{color:var(--danger)}
+  .stat span{font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.04em}
+  .bars{
+    text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:18px;max-height:260px;overflow:auto;
+  }
+  .bars .label{margin-bottom:8px}
+  .bar{display:grid;grid-template-columns:28px 1fr 44px;gap:8px;align-items:center;margin-bottom:5px;font-size:.75rem}
+  .bar .n{color:var(--muted);font-weight:600;text-align:right}
+  .bar .track{height:8px;background:var(--paper-2);border-radius:4px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--green);border-radius:4px}
+  .bar.over .fill{background:var(--danger)}
+  .bar .s{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+  .bar.over .s{color:var(--danger)}
+  .done .sub{font-size:.8rem;color:var(--muted);margin-bottom:22px;line-height:1.6}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header style="display:none"></header>
+
+  <div class="owner">
+    <div class="name"><small>Study Timer · Personal</small>박지환 전용 공부 타이머</div>
+    <div class="today" id="todayBox">오늘 푼 문제<br><b id="todayCount">0</b>문제</div>
+  </div>
 
   <div class="cover">
     <span class="badge">TIME ATTACK · 필수</span>
@@ -250,6 +332,7 @@
         <button data-min="2">2분<small>120초</small></button>
         <button data-min="3">3분<small>180초</small></button>
         <button data-min="5">5분<small>300초</small></button>
+        <button data-min="10">10분<small>600초</small></button>
       </div>
     </div>
 
@@ -274,7 +357,7 @@
 
     <div class="field">
       <div class="toggle-row">
-        <span>음성 안내</span>
+        <span>음성 안내<small>시작 · 넘어가세요 · 집중 · 10초 카운트</small></span>
         <label class="switch">
           <input type="checkbox" id="voice" checked>
           <span class="slider"></span>
@@ -282,11 +365,31 @@
       </div>
     </div>
 
+    <div class="field">
+      <div class="toggle-row">
+        <span>딴생각 감지<small>화면을 벗어나면 "돌아와" + 이탈 기록</small></span>
+        <label class="switch">
+          <input type="checkbox" id="guard" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
     <button class="start" id="startBtn">시작</button>
+
+    <div class="hist" id="hist">
+      <button class="clear" id="clearHist">기록 지우기</button>
+      누적 <b id="hSessions">0</b>세션 · <b id="hSolved">0</b>문제<br>
+      최근: <span id="hLast">기록 없음</span>
+    </div>
   </div>
 
   <!-- RUN -->
   <div class="run" id="run">
+    <div class="topbar">
+      <div class="mini">이탈 <b id="leaveTxt">0</b>회</div>
+      <button class="icon-btn" id="fsBtn">전체화면</button>
+    </div>
     <div class="qmeta" id="qmeta">QUESTION</div>
     <div class="qnum" id="qnum">1 / 10</div>
     <div class="ring">
@@ -299,6 +402,7 @@
         <em id="phase">남은 시간</em>
       </div>
     </div>
+    <div class="alert" id="alert"></div>
     <div class="ctrls">
       <button class="btn-sub" id="pauseBtn">일시정지</button>
       <button class="btn-main" id="nextBtn">다음 문제</button>
@@ -312,24 +416,31 @@
   <!-- DONE -->
   <div class="done" id="done">
     <h2>완료</h2>
-    <p>모든 문제가 끝났습니다</p>
-    <div class="stat" id="doneStat"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="grid">
+      <div class="stat"><b id="sSolved">0</b><span>시간 안에 품</span></div>
+      <div class="stat"><b id="sOver">0</b><span>시간 초과</span></div>
+      <div class="stat"><b id="sLeave">0</b><span>딴생각(이탈)</span></div>
+    </div>
+    <div class="bars" id="bars"></div>
+    <div class="sub" id="doneStat"></div>
     <button class="start" id="againBtn" style="margin-top:0">다시 시작</button>
   </div>
 
-  <div class="credit">made by <b>DYHAN</b></div>
+  <div class="credit">made by <b>DYHAN</b> <span>· v1.0.0</span></div>
 </div>
 
 <script>
 (function(){
   const $ = id => document.getElementById(id);
   const setup=$("setup"), run=$("run"), done=$("done");
+  const STORE="jihwan_timer_v1";
+  const NAME="지환";
 
   // ---- setup state ----
   let perSec = 60;
   let total = 10;
 
-  // time segment
   $("segTime").querySelectorAll("button").forEach(b=>{
     b.onclick=()=>{
       $("segTime").querySelectorAll("button").forEach(x=>x.classList.remove("active"));
@@ -338,7 +449,6 @@
     };
   });
 
-  // count
   const clampCount=v=>Math.max(1,Math.min(200,v||1));
   function syncCount(){ $("qCount").value=total; }
   $("cMinus").onclick=()=>{ total=clampCount(total-1); syncCount(); };
@@ -346,24 +456,61 @@
   $("qCount").oninput=()=>{ total=clampCount(parseInt($("qCount").value,10)); };
   $("qCount").onblur =()=>{ syncCount(); };
 
+  // ---- history (localStorage) ----
+  function loadHist(){
+    try{ return JSON.parse(localStorage.getItem(STORE)||"[]"); }catch(e){ return []; }
+  }
+  function saveHist(list){
+    try{ localStorage.setItem(STORE, JSON.stringify(list.slice(-200))); }catch(e){}
+  }
+  function todayKey(d){
+    d=d||new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function paintHist(){
+    const list=loadHist();
+    const today=todayKey();
+    let tSolved=0, allSolved=0;
+    list.forEach(s=>{
+      allSolved+=s.total;
+      if(s.date===today) tSolved+=s.total;
+    });
+    $("todayCount").textContent=tSolved;
+    $("hSessions").textContent=list.length;
+    $("hSolved").textContent=allSolved;
+    if(list.length){
+      const l=list[list.length-1];
+      $("hLast").textContent=l.date+" · "+l.total+"문제 · 초과 "+l.over+" · 이탈 "+l.leaves;
+    }else{
+      $("hLast").textContent="기록 없음";
+    }
+  }
+  $("clearHist").onclick=()=>{
+    if(confirm("누적 기록을 모두 지울까?")){ saveHist([]); paintHist(); }
+  };
+
   // ---- run state ----
   const R=118, C=2*Math.PI*R;
   $("prog").style.strokeDasharray=C;
-  let cur=0, remain=0, timer=null, paused=false, soundOn=true, voiceOn=true;
+  let cur=0, remain=0, timer=null, paused=false;
+  let soundOn=true, voiceOn=true, guardOn=true;
+  let used=[], over=[], leaves=0, pauses=0, away=false, startedAt=0, lastQuestionStart=0, pausedTotal=0, pauseStartedAt=0;
 
   function fmt(s){
     const m=Math.floor(s/60), ss=s%60;
     return m+":"+String(ss).padStart(2,"0");
   }
 
-  // beep via WebAudio (no external file)
+  // beep via WebAudio
   let actx=null;
-  function beep(){
+  function ensureAudio(){
+    try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); }catch(e){}
+  }
+  function beep(seq){
     if(!soundOn) return;
     try{
-      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-      const seq=[880,660,880];
-      seq.forEach((f,i)=>{
+      ensureAudio();
+      (seq||[880,660,880]).forEach((f,i)=>{
         const o=actx.createOscillator(), g=actx.createGain();
         o.type="sine"; o.frequency.value=f;
         const t=actx.currentTime+i*0.18;
@@ -376,11 +523,13 @@
     }catch(e){}
   }
 
-  // ---- 음성 안내 (Web Speech API) ----
+  // ---- 음성 안내 ----
   const LINES = {
-    start: ["시작하세요"],
+    start: [NAME+", 시작"],
     next:  ["넘어가세요"],
-    end:   ["끝"]
+    half:  ["집중"],
+    back:  [NAME+", 돌아와"],
+    end:   [NAME+", 끝"]
   };
   let krVoice=null;
   function pickVoice(){
@@ -391,20 +540,69 @@
     pickVoice();
     window.speechSynthesis.onvoiceschanged=pickVoice;
   }
-  function say(kind){
+  function speak(text, cut){
     if(!voiceOn || !window.speechSynthesis) return;
-    const pool=LINES[kind]; if(!pool) return;
-    const text=pool[Math.floor(Math.random()*pool.length)];
     try{
+      if(cut) window.speechSynthesis.cancel();
       const u=new SpeechSynthesisUtterance(text);
       u.lang="ko-KR";
       if(krVoice) u.voice=krVoice;
-      u.rate=1; u.pitch=1; u.volume=1;
+      u.rate=1.05; u.pitch=1; u.volume=1;
       window.speechSynthesis.speak(u);
     }catch(e){}
   }
+  function say(kind, cut){
+    const pool=LINES[kind]; if(!pool) return;
+    speak(pool[Math.floor(Math.random()*pool.length)], cut);
+  }
   function stopSpeech(){ try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){} }
 
+  // ---- wake lock (phone screen stays on) ----
+  let wake=null;
+  async function lockWake(){
+    try{ if("wakeLock" in navigator){ wake=await navigator.wakeLock.request("screen"); } }catch(e){}
+  }
+  function unlockWake(){ try{ if(wake){ wake.release(); wake=null; } }catch(e){} }
+
+  // ---- fullscreen ----
+  const fsBtn=$("fsBtn");
+  if(!document.documentElement.requestFullscreen) fsBtn.style.display="none";
+  fsBtn.onclick=()=>{
+    try{
+      if(document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }catch(e){}
+  };
+  document.addEventListener("fullscreenchange",()=>{
+    fsBtn.textContent=document.fullscreenElement?"전체화면 해제":"전체화면";
+  });
+
+  // ---- 딴생각 감지 ----
+  function showAlert(msg, ms){
+    const a=$("alert"); a.textContent=msg; a.classList.add("show");
+    clearTimeout(a._t);
+    if(ms) a._t=setTimeout(()=>a.classList.remove("show"), ms);
+  }
+  function onAway(){
+    if(!guardOn || !run.classList.contains("show") || paused || away) return;
+    away=true;
+    leaves++;
+    $("leaveTxt").textContent=leaves;
+    say("back", true);
+    beep([440,440]);
+  }
+  function onBack(){
+    if(!away) return;
+    away=false;
+    showAlert("딴생각 감지 · 이탈 "+leaves+"회 · 시간은 계속 흘렀다", 4000);
+  }
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden) onAway(); else onBack();
+  });
+  window.addEventListener("blur",()=>{ setTimeout(()=>{ if(!document.hasFocus()) onAway(); },150); });
+  window.addEventListener("focus",onBack);
+
+  // ---- dots ----
   function buildDots(){
     const d=$("dots"); d.innerHTML="";
     for(let i=0;i<total;i++){
@@ -416,7 +614,10 @@
   function paintDots(){
     for(let i=0;i<total;i++){
       const el=$("dot"+i); if(!el) continue;
-      el.className="dot"+(i<cur?" done":(i===cur?" cur":""));
+      let c="dot";
+      if(i<cur) c+= over[i] ? " over" : " done";
+      else if(i===cur) c+=" cur";
+      el.className=c;
     }
   }
 
@@ -426,7 +627,7 @@
     const off=C*(1-remain/perSec);
     $("prog").style.strokeDashoffset=off;
     run.classList.remove("warn","danger");
-    if(remain<=5) run.classList.add("danger");
+    if(remain<=10) run.classList.add("danger");
     else if(remain<=Math.max(10,perSec*0.25)) run.classList.add("warn");
   }
 
@@ -439,77 +640,138 @@
       return;
     }
     render();
+    if(remain===Math.floor(perSec/2)) say("half", true);
+    else if(remain===10) speak("10초", true);
+    else if(remain>=1 && remain<=5) speak(String(remain), true);
   }
 
   function startQuestion(){
     remain=perSec;
     paused=false;
     $("pauseBtn").textContent="일시정지";
+    $("phase").textContent="남은 시간";
+    lastQuestionStart=Date.now();
     paintDots();
     render();
-    say("start");
     clearInterval(timer);
     timer=setInterval(tick,1000);
   }
 
+  function recordQuestion(auto){
+    const u=auto ? perSec : Math.min(perSec, perSec-Math.max(remain,0));
+    used[cur]=u;
+    over[cur]=!!auto;
+  }
+
   function advance(auto){
+    recordQuestion(auto);
     cur++;
     if(cur>=total){ finish(); return; }
-    say("next");
+    say("next", true);
     startQuestion();
   }
 
   function finish(){
     clearInterval(timer);
-    say("end");
-    run.classList.remove("show");
+    unlockWake();
+    say("end", true);
+    run.classList.remove("show","warn","danger");
     done.classList.add("show");
-    const mins=Math.round(total*perSec/60);
-    $("doneStat").textContent="총 "+total+"문제 · 문제당 "+(perSec/60)+"분 · 설정 시간 "+mins+"분";
+
+    const solved=over.filter(x=>!x).length;
+    const overN=over.filter(x=>x).length;
+    const elapsed=Math.round((Date.now()-startedAt-pausedTotal)/1000);
+    const avg=used.length?Math.round(used.reduce((a,b)=>a+b,0)/used.length):0;
+
+    $("sSolved").textContent=solved;
+    $("sOver").textContent=overN; $("sOver").className=overN?"bad":"";
+    $("sLeave").textContent=leaves; $("sLeave").className=leaves?"bad":"";
+
+    const v=$("verdict");
+    if(overN===0 && leaves===0){ v.textContent="완벽. 손이 먼저 움직였다."; v.className="verdict"; }
+    else if(leaves>0 && overN===0){ v.textContent="시간은 지켰지만 "+leaves+"번 딴생각. 다음엔 0회."; v.className="verdict bad"; }
+    else if(leaves===0){ v.textContent=overN+"문제에서 고민했다. 모르면 찍고 넘어가라."; v.className="verdict bad"; }
+    else { v.textContent="초과 "+overN+" · 이탈 "+leaves+". 집중부터 다시."; v.className="verdict bad"; }
+
+    const bars=$("bars");
+    bars.innerHTML='<div class="label">문제별 소요 시간</div>';
+    used.forEach((u,i)=>{
+      const row=document.createElement("div");
+      row.className="bar"+(over[i]?" over":"");
+      row.innerHTML='<span class="n">'+(i+1)+'</span><div class="track"><div class="fill" style="width:'+Math.round(u/perSec*100)+'%"></div></div><span class="s">'+(over[i]?"초과":fmt(u))+'</span>';
+      bars.appendChild(row);
+    });
+
+    $("doneStat").textContent="총 "+total+"문제 · 문제당 "+(perSec/60)+"분 · 실제 "+fmt(elapsed)+" · 평균 "+fmt(avg)+"/문제 · 일시정지 "+pauses+"회";
+
+    const list=loadHist();
+    list.push({date:todayKey(), ts:Date.now(), total:total, perSec:perSec, solved:solved, over:overN, leaves:leaves, pauses:pauses, elapsed:elapsed});
+    saveHist(list);
+    paintHist();
   }
 
   function startSession(){
     soundOn=$("sound").checked;
     voiceOn=$("voice").checked;
+    guardOn=$("guard").checked;
     stopSpeech();
+    ensureAudio();
     total=clampCount(parseInt($("qCount").value,10));
-    cur=0;
+    cur=0; used=[]; over=[]; leaves=0; pauses=0; away=false; pausedTotal=0;
+    startedAt=Date.now();
+    $("leaveTxt").textContent="0";
+    $("alert").classList.remove("show");
+    document.body.classList.add("focus");
     setup.style.display="none";
     done.classList.remove("show");
     run.classList.add("show");
-    $("qmeta").textContent="QUESTION";
     buildDots();
+    lockWake();
+    say("start", true);
     startQuestion();
   }
 
   function reset(){
     clearInterval(timer);
     stopSpeech();
+    unlockWake();
+    document.body.classList.remove("focus");
     run.classList.remove("show","warn","danger");
     done.classList.remove("show");
     setup.style.display="block";
+    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
+  }
+
+  function quit(){
+    if(!confirm(NAME+", 정말 포기할 거야?\n여기서 끄면 이번 세션은 기록되지 않는다.")) return;
+    reset();
+  }
+
+  function togglePause(){
+    paused=!paused;
+    if(paused){ pauseStartedAt=Date.now(); pauses++; }
+    else { pausedTotal+=Date.now()-pauseStartedAt; }
+    $("pauseBtn").textContent=paused?"계속":"일시정지";
+    $("phase").textContent=paused?"일시정지":"남은 시간";
   }
 
   // controls
   $("startBtn").onclick=startSession;
   $("againBtn").onclick=reset;
   $("nextBtn").onclick=()=>advance(false);
-  $("quitBtn").onclick=reset;
-  $("pauseBtn").onclick=()=>{
-    paused=!paused;
-    $("pauseBtn").textContent=paused?"계속":"일시정지";
-    $("phase").textContent=paused?"일시정지":"남은 시간";
-  };
+  $("quitBtn").onclick=quit;
+  $("pauseBtn").onclick=togglePause;
 
   // keyboard: space=pause, n/→=next, esc=quit
   document.addEventListener("keydown",e=>{
     if(!run.classList.contains("show")) return;
-    if(e.code==="Space"){ e.preventDefault(); $("pauseBtn").click(); }
+    if(e.code==="Space"){ e.preventDefault(); togglePause(); }
     else if(e.key==="n"||e.key==="ArrowRight"){ advance(false); }
-    else if(e.key==="Escape"){ reset(); }
+    else if(e.key==="Escape"){ quit(); }
   });
 
   syncCount();
+  paintHist();
 })();
 </script>
 </body>
