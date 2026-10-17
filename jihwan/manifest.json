@@ -1,0 +1,25 @@
+{
+  "name": "박지환 전용 공부 타이머",
+  "short_name": "지환 타이머",
+  "description": "박지환 전용 타임어택 공부 타이머. 딴생각 금지.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F1E8",
+  "theme_color": "#0E5C3F",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
